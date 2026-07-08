@@ -136,8 +136,11 @@ do
 
         block_level="$(echo -n "${BASH_REMATCH[1]}" | wc -c | xargs)"
         title="${BASH_REMATCH[3]}"
-        # in the link, space should not be used.
-        link="$(echo "$title" | sed -e 's/　/ /g' | tr ' ' '-' | tr '[:upper:]' '[:lower:]')"
+        # Hatena Blog assigns each heading an id equal to its text with every
+        # non-alphanumeric character (half/full-width spaces, symbols, emoji)
+        # removed. Case is preserved and spaces are not turned into hyphens.
+        # The anchor must reproduce that id, or the in-page link will not resolve.
+        link="$(printf '%s' "$title" | perl -CS -pe 's/[^\p{L}\p{N}]//g')"
 
         # Decide the indent size of the output.
         extra_space=""
