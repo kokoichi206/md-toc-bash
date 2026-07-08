@@ -136,11 +136,11 @@ do
 
         block_level="$(echo -n "${BASH_REMATCH[1]}" | wc -c | xargs)"
         title="${BASH_REMATCH[3]}"
-        # Hatena Blog assigns each heading an id equal to its text with every
-        # non-alphanumeric character (half/full-width spaces, symbols, emoji)
-        # removed. Case is preserved and spaces are not turned into hyphens.
+        # Hatena Blog assigns each heading an id derived from its text:
+        # spaces become hyphens; letters, numbers, and literal hyphens are kept
+        # with case preserved; every other character (symbols, emoji) is removed.
         # The anchor must reproduce that id, or the in-page link will not resolve.
-        link="$(printf '%s' "$title" | perl -CS -pe 's/[^\p{L}\p{N}]//g')"
+        link="$(printf '%s' "$title" | perl -CS -pe 's/[\x{20}\x{3000}]/-/g; s/[^\p{L}\p{N}-]//g')"
 
         # Decide the indent size of the output.
         extra_space=""
